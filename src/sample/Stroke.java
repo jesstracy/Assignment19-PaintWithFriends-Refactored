@@ -4,9 +4,9 @@ package sample;
  * Created by jessicatracy on 9/6/16.
  */
 public class Stroke {
-    private double xCoordinate;
-    private double yCoordinate;
-    private int strokeSize;
+    public double xCoordinate;
+    public double yCoordinate;
+    public int strokeSize;
 
     public Stroke() {
     }

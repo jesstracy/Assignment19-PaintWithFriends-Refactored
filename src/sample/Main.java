@@ -37,11 +37,13 @@ public class Main extends Application {
     final double DEFAULT_SCENE_WIDTH = 800;
     final double DEFAULT_SCENE_HEIGHT = 600;
     private boolean keepDrawing = true;
+//    boolean myTurn = true;
     private boolean isClientRunning = false;
     int strokeSize = 8;
+    Server myServer;
 
 //    Canvas canvas;
-//    GraphicsContext gc;
+    GraphicsContext gc;
     GraphicsContext secondGC;
 
     long drawDelay = 0;
@@ -69,36 +71,24 @@ public class Main extends Application {
         sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(sceneTitle, 0, 0);
 
-        Button button = new Button("Open second stage");
         HBox hbButton = new HBox(10);
         hbButton.setAlignment(Pos.TOP_LEFT);
-        hbButton.getChildren().add(button);
         grid.add(hbButton, 0, 1);
 
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent e) {
-                System.out.println("I can switch to another scene here ...");
-//                primaryStage.setScene(loginScene);
-                // change this to a command to send flag to server to start window?
-                // How do I get the server class to open the new window??????
-//                startSecondStage(secondGC);
-                startSecondStage();
-            }
-        });
-
-//        Button openClientSocketButton = new Button("Show your strokes to a friend!");
-//        hbButton.getChildren().add(openClientSocketButton);
-//
-//        openClientSocketButton.setOnAction(new EventHandler<ActionEvent>() {
+//        Button startServerButton = new Button("Start server");
+//        hbButton.getChildren().add(startServerButton);
+//        startServerButton.setOnAction(new EventHandler<ActionEvent>() {
 //            @Override
-//            public void handle(ActionEvent event) {
-//                System.out.println("Now opening client socket...");
-////                myClient = new Client();
-//                isClientRunning = true;
-//                myClient.startClientSocket();
+//            public void handle(ActionEvent e) {
+//                System.out.println("Starting server...");
+//                // start the server on a new thread and pass it the graphics context.
+//                myServer = new Server(gc, myMain);
+//                Thread serverThread = new Thread(myServer);
+//                serverThread.start();
+//
 //            }
 //        });
+
 
         Button replayDrawingButton = new Button("Replay my drawing! (Coming soon)");
         hbButton.getChildren().add(replayDrawingButton);
@@ -140,29 +130,12 @@ public class Main extends Application {
         hbButton.getChildren().add(ipComboBox);
 
 
-        Button connectButton = new Button("Connect! (Coming soon)");
+        Button connectButton = new Button("Connect!");
         hbButton.getChildren().add(connectButton);
 
         connectButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-//                System.out.println("Now opening client socket...");
-//                isClientRunning = true;
-//                String ipAddress = null;
-//                if (ipComboBox.getValue().toString().equals("localhost")) {
-//                    ipAddress = "localhost";
-//                }
-//                if (ipComboBox.getValue().toString().equals("Ben")) {
-//                    ipAddress = "10.0.0.28";
-//                }
-//                if (ipAddress != null) {
-//                    myClient.setIpAddress(ipAddress);
-//                    myClient.startClientSocket();
-//                    hbButton.getChildren().remove(connectButton);
-//                } else {
-//                    System.out.println("You must select a friend in order to connect!");
-//                }
-
                 // new version!!!
                 System.out.println("Now opening client socket to connect to: " + ipComboBox.getValue().toString());
 
@@ -183,7 +156,19 @@ public class Main extends Application {
                     System.out.println("Exception caught when making client socket...");
                     exception.printStackTrace();
                 }
+            }
+        });
 
+        Button iWantToDrawButton = new Button("I want to draw");
+        hbButton.getChildren().add(iWantToDrawButton);
+
+        iWantToDrawButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+//                if (!myServer.isMyTurn()) {
+                    out.println("switch");
+//                }
+                myServer.setMyTurn(true);
             }
         });
 
@@ -192,23 +177,25 @@ public class Main extends Application {
         // add canvas
         Canvas canvas = new Canvas(DEFAULT_SCENE_WIDTH, DEFAULT_SCENE_HEIGHT-100);
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.GREEN);
         gc.setStroke(Color.BLUE);
         gc.setStroke(Color.color(Math.random(), Math.random(), Math.random()));
         gc.setLineWidth(5);
 
-        // start the server on a new thread and pass it the graphics context.
-        Server myServer = new Server(gc);
+
+        myServer = new Server(gc);
         Thread serverThread = new Thread(myServer);
         serverThread.start();
+        System.out.println("AT 187");
 
         canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
 
             @Override
             public void handle(MouseEvent e) {
 //                System.out.println("x: " + e.getX() + ", y: " + e.getY());
-                if (keepDrawing) {
+                if (keepDrawing && myServer.isMyTurn()) {
+                    System.out.println("myTurn is " + myServer.isMyTurn());
                     gc.strokeOval(e.getX(), e.getY(), strokeSize, strokeSize);
                     // save stroke to client's arrayList for replay button (NOT DONE YET)
 //                    Stroke saveStroke = new Stroke(e.getX(), e.getY(), strokeSize);
@@ -274,16 +261,18 @@ public class Main extends Application {
     }
 
     public void sendStrokeToServer(Stroke stroke) {
-        try {
+//        try {
             String serializedStroke = jsonSerialize(stroke);
             System.out.println("What client is trying to send: " + serializedStroke);
             out.println(serializedStroke);
 
-            System.out.println("Server's response: " + in.readLine());
-        } catch (IOException exception) {
-            System.out.println("Exception caught when reading in from server...");
-            exception.printStackTrace();
-        }
+//        in.readLine();
+
+//            System.out.println("Server's response: " + in.readLine());
+//        } catch (IOException exception) {
+//            System.out.println("Exception caught when reading in from server...");
+//            exception.printStackTrace();
+//        }
     }
 
     // serialize and deserialize methods
