@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -41,6 +42,9 @@ public class Main extends Application {
     private boolean isClientRunning = false;
     int strokeSize = 8;
     Server myServer;
+
+//    private Paint color = Color.color(Math.random(), Math.random(), Math.random());
+    private Paint color = Color.BLACK;
 
 //    Canvas canvas;
     GraphicsContext gc;
@@ -165,10 +169,13 @@ public class Main extends Application {
         iWantToDrawButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-//                if (!myServer.isMyTurn()) {
+                if (isClientRunning) {
                     out.println("switch");
-//                }
+
+                }
                 myServer.setMyTurn(true);
+                gc.setStroke(Color.BLUE);
+                out.println(Color.BLUE);
             }
         });
 
@@ -180,7 +187,7 @@ public class Main extends Application {
         gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.GREEN);
         gc.setStroke(Color.BLUE);
-        gc.setStroke(Color.color(Math.random(), Math.random(), Math.random()));
+        gc.setStroke(color);
         gc.setLineWidth(5);
 
 
@@ -195,7 +202,6 @@ public class Main extends Application {
             public void handle(MouseEvent e) {
 //                System.out.println("x: " + e.getX() + ", y: " + e.getY());
                 if (keepDrawing && myServer.isMyTurn()) {
-                    System.out.println("myTurn is " + myServer.isMyTurn());
                     gc.strokeOval(e.getX(), e.getY(), strokeSize, strokeSize);
                     // save stroke to client's arrayList for replay button (NOT DONE YET)
 //                    Stroke saveStroke = new Stroke(e.getX(), e.getY(), strokeSize);
@@ -210,7 +216,6 @@ public class Main extends Application {
                     // only add stroke to client's strokeList if the client is running! (NOT DONE)
                     if (isClientRunning) {
                         Stroke clientStrokeMain = new Stroke(e.getX(), e.getY(), strokeSize);
-                        System.out.println("\tStroke I'm about to send to server: " + clientStrokeMain);
                         sendStrokeToServer(clientStrokeMain);
 
 
@@ -227,8 +232,19 @@ public class Main extends Application {
                 System.out.println(e.getText());
 
                 if (e.getText().equalsIgnoreCase("D")) {
-                    System.out.println("Toggle drawing!");
                     keepDrawing = !keepDrawing;
+                }
+//
+//                if (e.getText().equalsIgnoreCase("A")) {
+//                    color = Color.color(Math.random(), Math.random(), Math.random());
+//                    gc.setStroke(color);
+//                }
+
+                if(e.getText().equalsIgnoreCase("C")){
+                    Paint currentColor = Color.color(Math.random(), Math.random(), Math.random());
+                    gc.setStroke(currentColor);
+//                    String JSONColor = seri.serialize(currentColor);
+                    out.println(currentColor);
                 }
 
                 if (e.getCode() == KeyCode.UP) {

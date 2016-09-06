@@ -2,6 +2,9 @@ package sample;
 
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import jodd.json.JsonParser;
 
 import java.io.BufferedReader;
@@ -53,19 +56,24 @@ public class Server implements Runnable {
 //        serverGC.strokeOval(50, 50, 50, 50);
         String clientInput;
         while ((clientInput = inputFromClient.readLine()) != null) {
-            System.out.println(clientInput);
-
+            System.out.println("From ben: " + clientInput);
             if (clientInput.equals("switch")) {
-                System.out.println("Iffing");
                 myTurn = !myTurn;
             }
-            if (!clientInput.equals("switch")) {
+            if (clientInput.substring(0,2).equals("0x")) {
+//                Color paintColor = deserializeColor(clientInput);
+                Paint myColor = Color.valueOf(clientInput);
+
+                serverGC.setStroke(myColor);
+            }
+            if (!clientInput.equals("switch") && !clientInput.substring(0,2).equals("0x")) {
                 Stroke deserializedStroke = jsonDeserializeStroke(clientInput);
 //            serverGC.strokeOval(deserializedStroke.getxCoordinate(), deserializedStroke.getyCoordinate(), deserializedStroke.getStrokeSize(), deserializedStroke.getStrokeSize());
+//                serverGC.setStroke(deserializedStroke.color);
                 serverGC.strokeOval(deserializedStroke.getxCoordinate(), deserializedStroke.getyCoordinate(), deserializedStroke.getStrokeSize(), deserializedStroke.getStrokeSize());
 
                 // tell client you received their stroke
-                outputToClient.println("Received your stroke!");
+//                outputToClient.println("Received your stroke!");
             }
         }
 
@@ -75,6 +83,13 @@ public class Server implements Runnable {
         Stroke myStrokeObject = myParser.parse(jsonString, Stroke.class);
         return myStrokeObject;
     }
+
+//    public Color deserializeColor(String jsonString) {
+//        Color myPaintObject = myParser.parse(jsonString, Color.class);
+//        return myPaintObject;
+//    }
+
+
 
     public boolean isMyTurn() {
         return myTurn;
