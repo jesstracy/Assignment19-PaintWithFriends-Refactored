@@ -3,6 +3,7 @@ package sample;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Main extends Application {
     final double DEFAULT_SCENE_WIDTH = 800;
@@ -45,6 +47,7 @@ public class Main extends Application {
 
 //    private Paint color = Color.color(Math.random(), Math.random(), Math.random());
     private Paint color = Color.BLACK;
+    private ArrayList<Stroke> strokeList = new ArrayList<Stroke>();
 
 //    Canvas canvas;
     GraphicsContext gc;
@@ -94,35 +97,35 @@ public class Main extends Application {
 //        });
 
 
-        Button replayDrawingButton = new Button("Replay my drawing! (Coming soon)");
+        Button replayDrawingButton = new Button("Replay my drawing!");
         hbButton.getChildren().add(replayDrawingButton);
 
         replayDrawingButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-//                if (gc != null) {
-//                    System.out.println("Replaying drawing...");
-//                    try {
-//                        gc.clearRect(0, 0, DEFAULT_SCENE_WIDTH, DEFAULT_SCENE_HEIGHT-100);
-////                        Thread.sleep(500);
-//                        drawDelay = 0;
-//                        for (Stroke stroke : myClient.getStrokeList()) {
-//                            System.out.println("Replaying stroke now");
-////                            sleepBetweenStrokes(stroke);
-////                            Thread.sleep(stroke.getStrokeTime().toEpochMilli() - myClient.getTimeOfFirstStroke().toEpochMilli());
-////                            wait(stroke.getStrokeTime().toEpochMilli() - myClient.getTimeOfFirstStroke().toEpochMilli());
-////                            gc.strokeOval(stroke.getxCoordinate(), stroke.getyCoordinate(), stroke.getStrokeSize(), stroke.getStrokeSize());
-//                            DelayedTask<Void> sleeper = new DelayedTask<Void>(stroke, gc);
-//                            Thread waitingThread = new Thread(sleeper);
-//                            waitingThread.start();
-//                        }
-//                    } catch (Exception exception) {
-//                        System.out.println("Exception caught in sleep time.");
-//                        exception.printStackTrace();
-//                    }
-//                } else {
-//                    System.out.println("No strokes to replay yet!");
-//                }
+                if (gc != null) {
+                    System.out.println("Replaying drawing...");
+                    try {
+                        gc.clearRect(0, 0, DEFAULT_SCENE_WIDTH, DEFAULT_SCENE_HEIGHT-100);
+//                        Thread.sleep(500);
+                        drawDelay = 0;
+                        for (Stroke stroke : strokeList) {
+                            System.out.println("Replaying stroke now");
+//                            sleepBetweenStrokes(stroke);
+//                            Thread.sleep(stroke.getStrokeTime().toEpochMilli() - myClient.getTimeOfFirstStroke().toEpochMilli());
+//                            wait(stroke.getStrokeTime().toEpochMilli() - myClient.getTimeOfFirstStroke().toEpochMilli());
+//                            gc.strokeOval(stroke.getxCoordinate(), stroke.getyCoordinate(), stroke.getStrokeSize(), stroke.getStrokeSize());
+                            DelayedTask<Void> sleeper = new DelayedTask<Void>(stroke, gc);
+                            Thread waitingThread = new Thread(sleeper);
+                            waitingThread.start();
+                        }
+                    } catch (Exception exception) {
+                        System.out.println("Exception caught in sleep time.");
+                        exception.printStackTrace();
+                    }
+                } else {
+                    System.out.println("No strokes to replay yet!");
+                }
             }
         });
 
@@ -194,7 +197,6 @@ public class Main extends Application {
         myServer = new Server(gc);
         Thread serverThread = new Thread(myServer);
         serverThread.start();
-        System.out.println("AT 187");
 
         canvas.setOnMouseDragged(new EventHandler<MouseEvent>() {
 
@@ -206,6 +208,8 @@ public class Main extends Application {
                     // save stroke to client's arrayList for replay button (NOT DONE YET)
 //                    Stroke saveStroke = new Stroke(e.getX(), e.getY(), strokeSize);
 //                    myClient.addStrokeToArrayList(saveStroke);
+                    Stroke clientStrokeMain = new Stroke(e.getX(), e.getY(), strokeSize);
+                    strokeList.add(clientStrokeMain);
 
                     // To avoid error messages before second screen is open
                     if (secondGC != null) {
@@ -215,9 +219,7 @@ public class Main extends Application {
 
                     // only add stroke to client's strokeList if the client is running! (NOT DONE)
                     if (isClientRunning) {
-                        Stroke clientStrokeMain = new Stroke(e.getX(), e.getY(), strokeSize);
                         sendStrokeToServer(clientStrokeMain);
-
 
                     }
                 }
@@ -361,6 +363,59 @@ public class Main extends Application {
         System.out.println("About to show the second stage");
 
         secondaryStage.show();
+    }
+
+    /**
+     * We extend the Task class so that we can be "runnable" from
+     * within a UI thread
+     *
+     * Note: this is an inner class inside of the Main class to make it easier
+     * to manage the scope of the strokes and the draw delay and delay increments
+     * @param <Void>
+     */
+    class DelayedTask<Void> extends Task<Void> {
+
+        Stroke stroke;
+        GraphicsContext graphicsContext;
+
+        /**
+         * Constructor to initialize the Stroke and GraphicsContext objects
+         * @param stroke
+         * @param graphicsContext
+         */
+        public DelayedTask(Stroke stroke, GraphicsContext graphicsContext) {
+            this.graphicsContext = graphicsContext;
+            this.stroke = stroke;
+        }
+
+        /**
+         * This is the same thing as a Runnable object's run() method - it gets called
+         * when the Thread that has this "Task" object is started
+         * @return
+         * @throws Exception
+         */
+//        @Override
+        protected Void call() throws Exception {
+            long sleepTime = getDrawDelay();
+            try {
+                Thread.sleep(sleepTime);
+                graphicsContext.strokeOval(stroke.getxCoordinate(), stroke.getyCoordinate(), stroke.getStrokeSize(), stroke.getStrokeSize());
+            } catch (InterruptedException e) {
+            }
+            return null;
+        }
+
+    }
+
+    /**
+     * All the delayed tasks threads will be started pretty much at the same time,
+     * so we delay them all by an increasingly longer time to ensure that they execute
+     * a) sequentially and b) with "delayIncrements" amount of time in between each other
+     * @return
+     */
+    private long getDrawDelay() {
+        drawDelay = drawDelay + delayIncrements;
+        return drawDelay;
     }
 
 
