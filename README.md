@@ -8,11 +8,11 @@ Objective
 
 Create an app that allows the following:
 
-Using a keyboard shortcut ("d"), allow the user to toggle whether or not moving the mouse draws on the screen
-Using the up and down arrow, allow the user to change the size of the stroke used to draw
-Allow the user to enter the IP address of a "friend" and to connect to that friend
-If user A is connected to their friend, user B, then whatever user A is drawing on their screen should also draw on user B's screen
-Note: your program will be running on both user's computers
+Using a keyboard shortcut ("d"), allow the user to toggle whether or not moving the mouse draws on the screen.
+Using the up and down arrow, allow the user to change the size of the stroke used to draw.
+Allow the user to enter the IP address of a "friend" and to connect to that friend.
+If user A is connected to their friend, user B, then whatever user A is drawing on their screen should also draw on user B's screen.
+Note: your program will be running on both user's computers.
 
 Other controls:
 * "c" changes the color of your stroke
@@ -38,7 +38,9 @@ Instructions for running the app
 --------------------------------
 
 On two computers:
+
 Enter the IP address of the other user in line 154 of Main.java. Then run Main.java from both computers and request to connect to the other person's IP address. You can then send the user your strokes, and they can request to send their strokes back to you!
 
 On a single computer:
+
 Draw by yourself by running Main.java. Or, see the app's multiplayer functionality by running two instances of Main.java. On the second screen, select "localhost" and click connect. You will now be able to see your strokes be drawn on the first screen as well! (On a single computer, however, you cannot switch turns since the localhost address is already in use.)
