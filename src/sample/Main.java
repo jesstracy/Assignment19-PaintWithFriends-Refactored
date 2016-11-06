@@ -37,7 +37,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class Main extends Application {
-    final double DEFAULT_SCENE_WIDTH = 800;
+    final double DEFAULT_SCENE_WIDTH = 1000;
     final double DEFAULT_SCENE_HEIGHT = 600;
     private boolean keepDrawing = true;
 //    boolean myTurn = true;
@@ -74,9 +74,13 @@ public class Main extends Application {
         grid.setGridLinesVisible(true);
 
         // add buttons and canvas to the grid
-        Text sceneTitle = new Text("Welcome to Paint application");
+        Text sceneTitle = new Text("Welcome to the Paint application");
         sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(sceneTitle, 0, 0);
+
+        Text sceneControls = new Text("Controls: \"c\" changes stroke color, up and down arrows change stroke width");
+        sceneControls.setFont(Font.font("Tahoma", FontWeight.NORMAL, 14));
+        grid.add(sceneControls, 0, 3);
 
         HBox hbButton = new HBox(10);
         hbButton.setAlignment(Pos.TOP_LEFT);
@@ -132,7 +136,7 @@ public class Main extends Application {
         Text comboBoxHeading = new Text("Show your drawing to: ");
         hbButton.getChildren().add(comboBoxHeading);
 
-        ObservableList<String> ipOptions = FXCollections.observableArrayList("localhost", "Ben");
+        ObservableList<String> ipOptions = FXCollections.observableArrayList("localhost", "Other user (enter manually in line 154 of Main.java)");
         ComboBox ipComboBox = new ComboBox(ipOptions);
         hbButton.getChildren().add(ipComboBox);
 
@@ -150,8 +154,8 @@ public class Main extends Application {
                 if (ipComboBox.getValue().toString().equals("localhost")) {
                     ipAddress = "localhost";
                 }
-                if (ipComboBox.getValue().toString().equals("Ben")) {
-                    ipAddress = "10.0.0.28";
+                if (ipComboBox.getValue().toString().equals("Other user (enter manually in line 154 of Main.java)")) {
+                    ipAddress = "Enter IP address here";
                 }
                 try {
                     Socket clientSocket = new Socket(ipAddress, 8005);
