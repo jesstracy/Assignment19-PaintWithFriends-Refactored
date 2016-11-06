@@ -8,16 +8,11 @@ Objective
 
 Create an app that allows the following:
 
-Using a keyboard shortcut ("d"), allow the user to toggle whether or not moving the mouse draws on the screen.
-Using the up and down arrow, allow the user to change the size of the stroke used to draw.
-Allow the user to enter the IP address of a "friend" and to connect to that friend.
-If user A is connected to their friend, user B, then whatever user A is drawing on their screen should also draw on user B's screen.
-Note: your program will be running on both user's computers.
-
-Other controls:
-* "c" changes the color of your stroke
-* Up and down arrows change the width of your stroke
-* Press the "replay" to replay your drawing
+* Using a keyboard shortcut ("d"), allow the user to toggle whether or not moving the mouse draws on the screen
+* Using the up and down arrow, allow the user to change the size of the stroke used to draw
+* Using a keyboard shortcut ("c"), allow the user to change stroke color
+* Allow the user to enter the IP address of a "friend" and to connect to that friend
+* If user A is connected to their friend, user B, then whatever user A is drawing on their screen should also draw on user B's screen
 
 Extra 1:
 
