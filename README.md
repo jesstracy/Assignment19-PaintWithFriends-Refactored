@@ -31,11 +31,14 @@ Allow each user (user A or user B) to "save" the drawing
 For this exercise, you will save the drawing as a list of "strokes" that can be redrawn at any time ...
 
 Extra 3:
+
 Animate the redrawing so that it doesn't just "appear" almost instantaneously (accomplished this by using the DelayedTask class since we can't manipulate the main thread that the UI works on)
 
-Instructions for Running the App
+Instructions for running the app
 --------------------------------
 
-On two computers: Enter the IP address of the other user in line 154 of Main.java. Then run Main.java from both computers and request to connect to the other person's IP address. You can then send the user your strokes, and they can request to send their strokes back to you!
+On two computers:
+Enter the IP address of the other user in line 154 of Main.java. Then run Main.java from both computers and request to connect to the other person's IP address. You can then send the user your strokes, and they can request to send their strokes back to you!
 
-On a single computer: Draw by yourself by running Main.java. Or, see the app's multiplayer functionality by running two instances of Main.java. On the second screen, select "localhost" and click connect. You will now be able to see your strokes be drawn on the first screen as well! (On a single computer, however, you cannot switch turns since the localhost address is already in use.)
+On a single computer:
+Draw by yourself by running Main.java. Or, see the app's multiplayer functionality by running two instances of Main.java. On the second screen, select "localhost" and click connect. You will now be able to see your strokes be drawn on the first screen as well! (On a single computer, however, you cannot switch turns since the localhost address is already in use.)
